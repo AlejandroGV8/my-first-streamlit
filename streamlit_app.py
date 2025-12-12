@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from snowflake.snowpark import Session
 
-# --- Conexión a Snowflake usando secrets ---
+# --- Conexión a Snowflake usando secretos ---
 session = Session.builder.configs(st.secrets["snowflake"]).create()
 
 # --- Título y descripción ---
