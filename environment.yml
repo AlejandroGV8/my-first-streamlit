@@ -1,6 +1,11 @@
 name: app_environment
 channels:
-  - snowflake
+  - conda-forge
 dependencies:
+  - python=3.11
   - pandas
-  - plotly  # opcional, para gráficos más interactivos
+  - plotly
+  - pip
+  - pip:
+      - streamlit
+      - snowflake-snowpark-python
