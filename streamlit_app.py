@@ -1,21 +1,21 @@
 import streamlit as st
 import pandas as pd
-from snowflake.snowpark.context import get_active_session
+from snowflake.snowpark import Session
 
-# --- Obtener la sesión activa de Snowflake ---
-session = get_active_session()
+# --- Conexión a Snowflake usando secrets ---
+session = Session.builder.configs(st.secrets["snowflake"]).create()
 
 # --- Título y descripción ---
 st.title("Dashboard Interactivo de Clientes")
 st.write("Esta app muestra la cantidad de clientes por segmento de mercado. Puedes filtrar por segmento.")
 
-# --- Filtro por segmento (actualizado con tus datos) ---
+# --- Filtro por segmento de mercado ---
 segmento = st.selectbox(
     "Filtra por segmento de mercado:",
     ["Todos", "HOUSEHOLD", "BUILDING", "FURNITURE", "AUTOMOBILE", "MACHINERY"]
 )
 
-# --- Consulta SQL dinámica ---
+# --- Consulta SQL dinámica según el filtro ---
 if segmento == "Todos":
     query = """
     SELECT C_MKTSEGMENT, COUNT(*) AS cantidad
@@ -35,7 +35,7 @@ else:
 # --- Ejecutar la consulta y convertir a DataFrame ---
 df = session.sql(query).to_pandas()
 
-# --- Renombrar columnas a minúsculas ---
+# --- Renombrar columnas a minúsculas para evitar errores ---
 df.columns = [col.lower() for col in df.columns]
 
 # --- Mostrar KPI total de clientes ---
