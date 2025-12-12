@@ -9,10 +9,10 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- Conexión a Snowflake (con caché para mejor rendimiento) ---
+# --- Conexión a Snowflake usando Streamlit Secrets ---
 @st.cache_resource
 def get_snowflake_session():
-    """Crea y cachea la sesión de Snowflake"""
+    """Crea y cachea la sesión de Snowflake usando st.secrets"""
     try:
         return Session.builder.configs(st.secrets["snowflake"]).create()
     except Exception as e:
@@ -34,7 +34,7 @@ segmento = st.selectbox(
 )
 
 # --- Función para obtener datos con caché ---
-@st.cache_data(ttl=600)  # Cache por 10 minutos
+@st.cache_data(ttl=600)
 def get_customer_data(_session, segmento_filtro):
     """Obtiene datos de clientes desde Snowflake"""
     try:
@@ -46,7 +46,6 @@ def get_customer_data(_session, segmento_filtro):
                 ORDER BY CANTIDAD DESC
             """
         else:
-            # Nota: En producción, usa binding parameters si está disponible
             query = f"""
                 SELECT C_MKTSEGMENT, COUNT(*) AS CANTIDAD
                 FROM CLIENTES
@@ -100,7 +99,6 @@ with col2:
 # --- Tabla de datos detallados ---
 st.subheader("📊 Datos Detallados")
 
-# Formatear la tabla
 df_display = df.copy()
 df_display.columns = ["Segmento de Mercado", "Cantidad"]
 df_display["Cantidad"] = df_display["Cantidad"].apply(lambda x: f"{x:,}")
